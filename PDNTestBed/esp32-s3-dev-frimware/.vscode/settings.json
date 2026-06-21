@@ -1,0 +1,6 @@
+{
+    "clangd.arguments": [
+        "--compile-commands-dir=z:/Git-Projects/pdn-mqtt-test/esp32-s3-dev-frimware/.cache/clangd",
+        "--query-driver=C:/Users/papac/.platformio/packages/toolchain-*/bin/*,C:/Users/papac/.platformio/packages/tool-*/bin/*"
+    ]
+}

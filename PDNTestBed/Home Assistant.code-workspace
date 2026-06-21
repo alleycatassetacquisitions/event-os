@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "../../Alleycat/Home Assistant"
+		},
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"clangd.arguments": [
+			"--compile-commands-dir=z:/Git-Projects/pioarduino/260602-230021-esp32-s3-devkitm-1/.cache/clangd",
+			"--query-driver=C:/Users/papac/.platformio/packages/toolchain-*/bin/*,C:/Users/papac/.platformio/packages/tool-*/bin/*"
+		]
+	}
+}

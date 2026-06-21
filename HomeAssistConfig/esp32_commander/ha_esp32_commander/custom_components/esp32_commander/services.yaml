@@ -1,0 +1,179 @@
+send_message:
+  name: Send Message
+  description: Send a text message to an ESP32 device display.
+  fields:
+    device_id:
+      name: Device ID
+      description: The unique ID of the target ESP32 device.
+      required: true
+      example: "esp32-device-01"
+      selector:
+        text:
+    message:
+      name: Message
+      description: The text to display.
+      required: true
+      example: "Hello World"
+      selector:
+        text:
+    duration:
+      name: Duration
+      description: How long to show the message in seconds (1–60).
+      required: false
+      default: 5
+      selector:
+        number:
+          min: 1
+          max: 60
+          unit_of_measurement: s
+    scroll:
+      name: Scroll
+      description: Whether to scroll the message.
+      required: false
+      default: false
+      selector:
+        boolean:
+
+set_led:
+  name: Set LED
+  description: Set the LED state on an ESP32 device.
+  fields:
+    device_id:
+      name: Device ID
+      description: The unique ID of the target ESP32 device.
+      required: true
+      example: "esp32-device-01"
+      selector:
+        text:
+    state:
+      name: State
+      description: Turn the LED on or off.
+      required: true
+      selector:
+        boolean:
+    brightness:
+      name: Brightness
+      description: LED brightness (0–255).
+      required: false
+      default: 255
+      selector:
+        number:
+          min: 0
+          max: 255
+    red:
+      name: Red
+      description: Red channel (0–255).
+      required: false
+      default: 255
+      selector:
+        number:
+          min: 0
+          max: 255
+    green:
+      name: Green
+      description: Green channel (0–255).
+      required: false
+      default: 255
+      selector:
+        number:
+          min: 0
+          max: 255
+    blue:
+      name: Blue
+      description: Blue channel (0–255).
+      required: false
+      default: 255
+      selector:
+        number:
+          min: 0
+          max: 255
+    effect:
+      name: Effect
+      description: LED effect pattern.
+      required: false
+      default: solid
+      selector:
+        select:
+          options:
+            - solid
+            - blink
+            - pulse
+            - rainbow
+
+trigger_haptic:
+  name: Trigger Haptic
+  description: Trigger the haptic motor on an ESP32 device.
+  fields:
+    device_id:
+      name: Device ID
+      description: The unique ID of the target ESP32 device.
+      required: true
+      example: "esp32-device-01"
+      selector:
+        text:
+    pattern:
+      name: Pattern
+      description: Haptic vibration pattern.
+      required: true
+      selector:
+        select:
+          options:
+            - short
+            - long
+            - double
+            - sos
+            - custom
+    intensity:
+      name: Intensity
+      description: Motor intensity (0–255).
+      required: false
+      default: 255
+      selector:
+        number:
+          min: 0
+          max: 255
+    duration_ms:
+      name: Duration
+      description: Pulse duration in milliseconds (10–5000).
+      required: false
+      default: 200
+      selector:
+        number:
+          min: 10
+          max: 5000
+          unit_of_measurement: ms
+    repeat:
+      name: Repeat
+      description: Number of times to repeat the pattern (1–10).
+      required: false
+      default: 1
+      selector:
+        number:
+          min: 1
+          max: 10
+
+send_raw:
+  name: Send Raw Command
+  description: Send a raw command to an ESP32 device with a custom JSON payload.
+  fields:
+    device_id:
+      name: Device ID
+      description: The unique ID of the target ESP32 device.
+      required: true
+      example: "esp32-device-01"
+      selector:
+        text:
+    action:
+      name: Action
+      description: The command action name (appended to the topic path).
+      required: true
+      example: "custom_action"
+      selector:
+        text:
+    payload:
+      name: Payload
+      description: A dictionary of key/value pairs to send as JSON inside the RawCmd.
+      required: true
+      example: '{"key": "value"}'
+      selector:
+        object:

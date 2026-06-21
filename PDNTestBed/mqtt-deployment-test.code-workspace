@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "esp32-s3-dev-frimware"
+		},
+		{
+			"path": "../../Alleycat/Home Assistant"
+		},
+		{
+			"path": "Resources"
+		}
+	],
+	"settings": {
+		"clangd.arguments": [
+			"--compile-commands-dir=z:/Git-Projects/pdn-mqtt-test/esp32-s3-dev-frimware/.cache/clangd",
+			"--query-driver=C:/Users/papac/.platformio/packages/toolchain-*/bin/*,C:/Users/papac/.platformio/packages/tool-*/bin/*"
+		]
+	}
+}

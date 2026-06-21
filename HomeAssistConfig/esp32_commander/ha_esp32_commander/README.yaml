@@ -1,0 +1,123 @@
+# ESP32 Commander — Setup README
+# ====================================
+# Follow these steps to install and configure the integration.
+
+# ── STEP 1: File Placement ──────────────────────────────────────────────────
+#
+# Copy these folders into your Home Assistant config directory:
+#
+#   config/
+#   ├── custom_components/
+#   │   └── esp32_commander/        ← backend integration
+#   │       ├── __init__.py
+#   │       ├── config_flow.py
+#   │       └── manifest.json
+#   └── www/
+#       └── esp32_commander/        ← frontend panel JS
+#           └── esp32-commander-panel.js
+
+
+# ── STEP 2: configuration.yaml additions ───────────────────────────────────
+#
+# Add the following to your configuration.yaml:
+
+# -- MQTT (skip if already configured) --
+mqtt:
+  broker: localhost        # or your Mosquitto broker IP
+  port: 1883
+  # username: your_user   # uncomment if broker requires auth
+  # password: your_pass
+
+# -- Register the custom frontend JS file --
+frontend:
+  extra_module_url:
+    - /local/esp32_commander/esp32-commander-panel.js
+
+# -- Register the sidebar panel --
+panel_custom:
+  - name: esp32-commander-panel
+    sidebar_title: ESP32 Commander
+    sidebar_icon: mdi:chip
+    url_path: esp32-commander
+    module_url: /local/esp32_commander/esp32-commander-panel.js
+
+
+# ── STEP 3: Add the Integration via UI ─────────────────────────────────────
+#
+# Go to: Settings → Integrations → Add Integration → search "ESP32 Commander"
+# Complete the config flow (just one field: MQTT topic prefix, default "esp32").
+
+
+# ── STEP 4: Flash ESP32 Devices ────────────────────────────────────────────
+#
+# Open esp32_commander_firmware.ino in Arduino IDE.
+# Edit the top section:
+#
+#   const char* DEVICE_ID     = "esp32-device-01";  ← unique per device!
+#   const char* WIFI_SSID     = "YOUR_SSID";
+#   const char* WIFI_PASSWORD = "YOUR_PASSWORD";
+#   const char* MQTT_HOST     = "192.168.1.x";      ← your HA/broker IP
+#
+# Flash to device. Repeat for each device with a unique DEVICE_ID.
+# Devices auto-register when they first publish their status.
+
+
+# ── STEP 5: Verify ─────────────────────────────────────────────────────────
+#
+# In HA, go to Developer Tools → MQTT and subscribe to:
+#   esp32/+/status
+#
+# Power on an ESP32 — you should see its JSON status appear within seconds.
+# Then open the ESP32 Commander sidebar panel and the device will appear!
+
+
+# ── MQTT TOPIC REFERENCE ───────────────────────────────────────────────────
+#
+#  Direction  | Topic                          | Payload
+#  -----------|--------------------------------|----------------------------
+#  HA → ESP32 | esp32/{id}/cmd/message         | {"text":"Hi","duration":5}
+#  HA → ESP32 | esp32/{id}/cmd/led             | {"state":true,"brightness":255,...}
+#  HA → ESP32 | esp32/{id}/cmd/haptic          | {"pattern":"short","intensity":200}
+#  ESP32 → HA | esp32/{id}/status              | {"rssi":-65,"uptime":120,...}
+
+
+# ── CALLING SERVICES FROM AUTOMATIONS ──────────────────────────────────────
+#
+# You can also call ESP32 Commander services from automations/scripts:
+
+# Send a message:
+service: esp32_commander.send_message
+data:
+  device_id: "esp32-device-01"
+  message: "Motion detected!"
+  duration: 10
+  scroll: false
+
+# Set LED:
+service: esp32_commander.set_led
+data:
+  device_id: "esp32-device-01"
+  state: true
+  brightness: 200
+  red: 255
+  green: 0
+  blue: 0
+  effect: blink
+
+# Trigger haptic:
+service: esp32_commander.trigger_haptic
+data:
+  device_id: "esp32-device-01"
+  pattern: double
+  intensity: 200
+  duration_ms: 150
+  repeat: 2
+
+# Send raw command (for future custom actions):
+service: esp32_commander.send_raw
+data:
+  device_id: "esp32-device-01"
+  action: buzzer
+  payload:
+    frequency: 1000
+    duration_ms: 500
