@@ -1,0 +1,58 @@
+list_players:
+  name: List Players
+  description: Fetch the player roster from the configured player API.
+  fields:
+    rows:
+      name: Rows
+      required: false
+      default: 100
+      selector:
+        number:
+          min: 1
+          max: 500
+    page:
+      name: Page
+      required: false
+      default: 1
+      selector:
+        number:
+          min: 1
+          max: 1000
+
+check_name:
+  name: Check Player Name
+  description: Live uniqueness check against the player API.
+  fields:
+    name:
+      name: Name
+      required: true
+      selector:
+        text:
+
+register_player:
+  name: Register Player
+  description: Create a player on the configured player API.
+  fields:
+    name:
+      name: Name
+      required: true
+      selector:
+        text:
+    hunter:
+      name: Hunter
+      required: true
+      default: 0
+      selector:
+        number:
+          min: 0
+          max: 1
+    allegiance:
+      name: Allegiance
+      required: true
+      default: ""
+      selector:
+        text:
+
+refresh_players:
+  name: Refresh Players
+  description: Re-fetch the roster and update the Player Roster sensor attributes.

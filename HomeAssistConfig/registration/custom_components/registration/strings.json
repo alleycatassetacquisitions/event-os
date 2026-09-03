@@ -1,0 +1,21 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Registration",
+        "description": "Player API base URL (Rust stub or Central). Never hardcode a hosted Bun hostname.",
+        "data": {
+          "base_url": "Primary URL (DigitalOcean)",
+          "fallback_url": "Local fallback URL (LAN server)",
+          "api_token": "API token (optional Bearer)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not reach /health on that URL."
+    },
+    "abort": {
+      "single_instance_allowed": "Registration is already configured."
+    }
+  }
+}

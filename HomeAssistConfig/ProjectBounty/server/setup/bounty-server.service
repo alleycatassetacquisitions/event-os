@@ -1,0 +1,19 @@
+[Unit]
+Description=ProjectBounty FastAPI Server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=bounty
+Group=bounty
+WorkingDirectory=/opt/projectbounty/server
+EnvironmentFile=/opt/projectbounty/bounty.env
+ExecStart=/opt/projectbounty/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8100 --access-log
+Restart=on-failure
+RestartSec=5
+
+ReadWritePaths=/opt/projectbounty
+
+[Install]
+WantedBy=multi-user.target

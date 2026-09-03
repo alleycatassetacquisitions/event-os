@@ -1,0 +1,41 @@
+[
+  {
+    "id": "1d9c8bc866bf",
+    "player_id": "p1",
+    "name": "Asimov",
+    "allegiance": "endline",
+    "bounty_amount": 2500000,
+    "crimes": [
+      "Bank heist",
+      "Mesh hijack"
+    ],
+    "stats": {
+      "height": "6'2\"",
+      "weight": "175 LBS",
+      "age": "36"
+    },
+    "flavor_text": "Extremely dangerous.",
+    "video_filename": "1d9c8bc866bf.webm",
+    "created_at": "2026-08-23T00:47:19.249601+00:00",
+    "updated_at": "2026-08-23T00:47:19.249601+00:00"
+  },
+  {
+    "id": "86e0a1fb03c4",
+    "player_id": "",
+    "name": "Asimov",
+    "allegiance": "endline",
+    "bounty_amount": 2500000,
+    "crimes": [
+      "Bank heist"
+    ],
+    "stats": {
+      "height": "6'2\"",
+      "weight": "175 LBS",
+      "age": "36"
+    },
+    "flavor_text": "Extremely dangerous.",
+    "video_filename": "86e0a1fb03c4.webm",
+    "created_at": "2026-08-23T00:47:52.697632+00:00",
+    "updated_at": "2026-08-23T00:47:52.697632+00:00"
+  }
+]

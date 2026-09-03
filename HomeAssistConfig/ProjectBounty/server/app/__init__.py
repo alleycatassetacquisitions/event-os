@@ -1,0 +1,1 @@
+"""ProjectBounty FastAPI application package."""

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ headline_main }} — {{ poster.name }}</title>
+  <link rel="stylesheet" href="/static/poster.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+</head>
+<body class="role-{{ poster.role }}">
+  <div class="stage" data-role="{{ poster.role }}" data-allegiance="{{ poster.allegiance }}">
+    <div class="hud-frame">
+      <div class="corner tl"></div>
+      <div class="corner tr"></div>
+      <div class="corner bl"></div>
+      <div class="corner br"></div>
+      <div class="status-lights">
+        <span class="light a"></span>
+        <span class="light b"></span>
+        <span class="light c"></span>
+      </div>
+
+      <section class="clip-pane">
+        <div class="clip-frame">
+          <div class="clip-label">SUBJECT FEED // LIVE</div>
+          {% if poster.video_url %}
+          <video
+            id="subject-video"
+            src="{{ poster.video_url }}"
+            autoplay
+            muted
+            loop
+            playsinline
+          ></video>
+          {% else %}
+          <div class="clip-empty">NO SIGNAL</div>
+          {% endif %}
+          <div class="scanlines" aria-hidden="true"></div>
+          <div class="vignette" aria-hidden="true"></div>
+        </div>
+      </section>
+
+      <section class="info-pane">
+        <header class="wanted-head">
+          <p class="eyebrow">GALACTIC BOUNTY NETWORK</p>
+          <h1 class="wanted-title">{{ headline_main }}</h1>
+          {% if headline_sub %}
+          <p class="wanted-sub">{{ headline_sub }}</p>
+          {% endif %}
+        </header>
+
+        <h2 class="subject-name">{{ poster.name }}</h2>
+        {% if poster.faction %}
+        <p class="faction-line">FACTION // {{ poster.faction }}</p>
+        {% endif %}
+
+        <div class="reward-block">
+          <div class="reward-rule"></div>
+          <p class="reward-label">{% if is_hunter %}RATE{% else %}REWARD{% endif %}</p>
+          <p class="reward-amount">{{ bounty_display }}</p>
+          <div class="reward-rule"></div>
+        </div>
+
+        <div class="data-grid">
+          <div class="col stats">
+            <h3>PHYSICAL</h3>
+            <dl>
+              <div><dt>HEIGHT</dt><dd>{{ poster.stats.height }}</dd></div>
+              <div><dt>WEIGHT</dt><dd>{{ poster.stats.weight }}</dd></div>
+              <div><dt>AGE</dt><dd>{{ poster.stats.age }}</dd></div>
+            </dl>
+            <h3 class="status-heading">STATUS</h3>
+            <dl class="status-dl">
+              {% for label, value in status_rows %}
+              <div><dt>{{ label }}</dt><dd>{{ value }}</dd></div>
+              {% endfor %}
+            </dl>
+          </div>
+          <div class="col crimes">
+            <h3>{{ list_heading }}</h3>
+            <ul>
+              {% for crime in poster.crimes %}
+              <li>{{ crime }}</li>
+              {% else %}
+              <li>{{ list_empty }}</li>
+              {% endfor %}
+            </ul>
+            <div class="mark-slot" aria-hidden="true">
+              <span class="mark-placeholder">FIXER MARK // TBD</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ticker-wrap">
+          <div class="ticker">
+            <span>{{ poster.flavor_text or "Subject classified. Approach with extreme caution." }}</span>
+            <span aria-hidden="true">{{ poster.flavor_text or "Subject classified. Approach with extreme caution." }}</span>
+          </div>
+        </div>
+
+        <footer class="allegiance-tag">
+          <img
+            class="neocorp-logo"
+            src="{{ neocorp_logo }}"
+            alt="{{ poster.allegiance }}"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';"
+          />
+          <span class="neocorp-fallback" style="display:none">NEOCORP // {{ poster.allegiance | upper }}</span>
+        </footer>
+      </section>
+    </div>
+  </div>
+  <script src="/static/poster.js"></script>
+</body>
+</html>

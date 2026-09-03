@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GBN — Active Players</title>
+  <link rel="stylesheet" href="/static/active-players.css" />
+</head>
+<body>
+  <iframe id="poster-frame" title="Active player poster" src="about:blank"></iframe>
+  <div id="hud" class="hud" hidden>
+    <span id="hud-label"></span>
+  </div>
+  <script>
+    window.GBN_ACTIVE = {
+      playerIds: {{ player_ids_json | safe }},
+      intervalSec: {{ interval_sec }},
+      publicBase: {{ public_base | tojson }}
+    };
+  </script>
+  <script src="/static/active-players.js"></script>
+</body>
+</html>

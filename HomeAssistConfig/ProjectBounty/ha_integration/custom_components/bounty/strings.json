@@ -1,0 +1,19 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Galactic Bounty Network",
+        "description": "URL of the ProjectBounty FastAPI server (poster + capture API).",
+        "data": {
+          "server_url": "Bounty server URL"
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Galactic Bounty Network is already configured."
+    },
+    "error": {
+      "cannot_connect": "Could not reach /health on that server."
+    }
+  }
+}
