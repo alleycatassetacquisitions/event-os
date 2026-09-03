@@ -1,0 +1,31 @@
+﻿- id: broadcast_zone_light_sync
+  alias: Sync FDN LEDs with venue light in the same broadcast zone
+  description: >
+    Matches lights by the broadcast_zone attribute (operator-defined AlleycatTV zone_id).
+    Starts disabled so it does not fire on every light in the house until you turn it on.
+  initial_state: false
+  mode: queued
+  max: 10
+  triggers:
+    - trigger: event
+      event_type: state_changed
+  conditions:
+    - condition: template
+      value_template: >
+        {{ trigger.event.data.entity_id is match('^light\\.')
+           and state_attr(trigger.event.data.entity_id, 'broadcast_zone') not in [none, ''] }}
+  actions:
+    - variables:
+        zone: "{{ state_attr(trigger.event.data.entity_id, 'broadcast_zone') }}"
+        src: "{{ trigger.event.data.entity_id }}"
+    - action: light.turn_on
+      target:
+        entity_id: >
+          {{ states.light
+             | selectattr('entity_id', 'ne', src)
+             | selectattr('attributes.broadcast_zone', 'defined')
+             | selectattr('attributes.broadcast_zone', 'eq', zone)
+             | map(attribute='entity_id')
+             | list }}
+      data:
+        rgb_color: "{{ state_attr(src, 'rgb_color') or [255, 0, 80] }}"

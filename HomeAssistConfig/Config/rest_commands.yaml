@@ -1,0 +1,31 @@
+﻿alleycattv_health:
+  url: !secret alleycattv_health_url
+  method: GET
+  timeout: 10
+
+alleycattv_list_zones:
+  url: !secret alleycattv_zones_url
+  method: GET
+  timeout: 10
+
+player_api_health:
+  url: !secret player_api_health_url
+  method: GET
+  timeout: 10
+
+player_api_list:
+  url: !secret player_api_players_url
+  method: GET
+  timeout: 15
+
+player_api_check_name:
+  url: "{{ base | default('http://192.168.1.234:8090') }}/api/players/check?name={{ name | urlencode }}"
+  method: GET
+  timeout: 10
+
+player_api_register:
+  url: "{{ base | default('http://192.168.1.234:8090') }}/api/players"
+  method: POST
+  content_type: "application/json; charset=utf-8"
+  payload: '{"name": "{{ name }}", "hunter": {{ hunter | int }}, "allegiance": "{{ allegiance }}"}'
+  timeout: 15

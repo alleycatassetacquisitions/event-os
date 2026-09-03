@@ -1,0 +1,11 @@
+{
+  "domain": "digital_node_nexus",
+  "name": "Digital Node Nexus",
+  "documentation": "https://github.com/yourusername/ha-digital-node-nexus",
+  "requirements": ["protobuf>=6.32.0"],
+  "dependencies": ["mqtt"],
+  "codeowners": [],
+  "version": "1.1.0",
+  "iot_class": "local_push",
+  "config_flow": true
+}

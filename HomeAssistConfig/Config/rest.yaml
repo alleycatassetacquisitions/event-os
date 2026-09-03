@@ -1,0 +1,33 @@
+﻿- resource: !secret alleycattv_health_url
+  scan_interval: 60
+  timeout: 10
+  sensor:
+    - name: AlleycatTV Health
+      unique_id: alleycattv_health
+      value_template: "{{ value_json.status | default('unknown') }}"
+
+- resource: !secret alleycattv_zones_url
+  scan_interval: 60
+  timeout: 10
+  sensor:
+    - name: AlleycatTV Zones
+      unique_id: alleycattv_zones
+      value_template: "{{ value_json | length if value_json is iterable else 0 }}"
+
+- resource: !secret player_api_health_url
+  scan_interval: 30
+  timeout: 10
+  sensor:
+    - name: Player API Health
+      unique_id: player_api_health
+      value_template: "{{ value_json.status | default('unknown') }}"
+
+- resource: !secret player_api_players_url
+  scan_interval: 30
+  timeout: 15
+  sensor:
+    - name: Player API Roster
+      unique_id: player_roster
+      value_template: "{{ value_json.data | length if value_json.data is defined else 0 }}"
+      json_attributes:
+        - data

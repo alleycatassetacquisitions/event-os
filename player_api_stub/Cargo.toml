@@ -1,0 +1,15 @@
+[package]
+name = "player_api_stub"
+version = "0.1.0"
+edition = "2021"
+description = "LAN player HTTP stub for Mission Control (photobooth-shaped JSON + check/create)"
+
+[dependencies]
+axum = { version = "0.8", features = ["json"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "net", "sync"] }
+tower-http = { version = "0.6", features = ["cors"] }
+utoipa = { version = "5", features = ["axum_extras"] }
+utoipa-swagger-ui = { version = "9", features = ["axum"] }
+uuid = { version = "1", features = ["v4"] }

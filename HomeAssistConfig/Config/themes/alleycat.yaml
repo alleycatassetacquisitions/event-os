@@ -1,0 +1,141 @@
+# Alleycat — in-universe operator theme for Home Assistant
+# Forked from common cyberpunk HA palettes. Requires card-mod for scanline extras.
+# Settings → Themes → Alleycat. Pair with HACS card-mod.
+#
+# Form fields: HA 2026 ha-input uses --ha-color-form-* (not input-fill-color).
+# modes.dark lets HA apply its dark semantic tokens instead of light-mode
+# white fills. Native <input> color-scheme is set in alleycat-scanlines.js.
+
+Alleycat:
+  primary-color: "#00e5ff"
+  accent-color: "#ff2bd6"
+  dark-primary-color: "#00b8d4"
+  light-primary-color: "#84ffff"
+  primary-text-color: "#e6fbff"
+  text-primary-color: "#041016"
+  secondary-text-color: "#7aa8b8"
+  disabled-text-color: "#4a6670"
+  primary-background-color: "#07090d"
+  secondary-background-color: "#0d1418"
+  card-background-color: "#10151c"
+  divider-color: "#1f3a44"
+  disabled-color: "#2a3a40"
+  error-color: "#ff3d5a"
+  warning-color: "#ffb020"
+  success-color: "#3dff9a"
+  info-color: "#00e5ff"
+  app-header-background-color: "#05070a"
+  app-header-text-color: "#00e5ff"
+  sidebar-background-color: "#05070a"
+  sidebar-icon-color: "#7aa8b8"
+  sidebar-selected-icon-color: "#00e5ff"
+  sidebar-text-color: "#c5e8f0"
+  sidebar-selected-text-color: "#00e5ff"
+  switch-checked-color: "#00e5ff"
+  switch-unchecked-button-color: "#4a6670"
+  rgb-primary-color: "0, 229, 255"
+  rgb-primary-text-color: "230, 251, 255"
+  rgb-secondary-text-color: "122, 168, 184"
+  rgb-card-background-color: "16, 21, 28"
+  ha-color-text-primary: "#e6fbff"
+  ha-color-text-secondary: "#7aa8b8"
+  ha-color-text-disabled: "#4a6670"
+  ha-color-surface-default: "#10151c"
+  ha-color-on-surface-default: "#e6fbff"
+  ha-color-form-background: "#0d1418"
+  ha-color-form-background-hover: "#121820"
+  ha-color-form-background-disabled: "#10151c"
+  ha-color-form-ink-color: "#e6fbff"
+  ha-color-form-border: "#1f3a44"
+  ha-color-form-border-focus: "#00e5ff"
+  input-fill-color: "#0d1418"
+  input-ink-color: "#e6fbff"
+  input-label-ink-color: "#7aa8b8"
+  input-disabled-fill-color: "#10151c"
+  input-disabled-ink-color: "#4a6670"
+  input-dropdown-icon-color: "#7aa8b8"
+  input-idle-line-color: "rgba(0, 229, 255, 0.42)"
+  input-hover-line-color: "#00e5ff"
+  input-disabled-line-color: "rgba(122, 168, 184, 0.2)"
+  input-outlined-idle-border-color: "#1f3a44"
+  input-outlined-hover-border-color: "#00e5ff"
+  input-outlined-disabled-border-color: "#2a3a40"
+  mdc-text-field-fill-color: "#0d1418"
+  mdc-text-field-ink-color: "#e6fbff"
+  mdc-text-field-label-ink-color: "#7aa8b8"
+  mdc-text-field-disabled-fill-color: "#10151c"
+  mdc-text-field-disabled-ink-color: "#4a6670"
+  mdc-select-fill-color: "#0d1418"
+  mdc-select-ink-color: "#e6fbff"
+  mdc-select-label-ink-color: "#7aa8b8"
+  mdc-select-disabled-fill-color: "#10151c"
+  md-sys-color-background: "#07090d"
+  md-sys-color-on-background: "#e6fbff"
+  md-sys-color-surface: "#10151c"
+  md-sys-color-on-surface: "#e6fbff"
+  md-sys-color-on-surface-variant: "#7aa8b8"
+  md-sys-color-surface-container-lowest: "#05070a"
+  md-sys-color-surface-container-low: "#0d1418"
+  md-sys-color-surface-container: "#10151c"
+  md-sys-color-surface-container-high: "#121820"
+  md-sys-color-surface-container-highest: "#162028"
+  md-sys-color-surface-variant: "#0d1418"
+  md-sys-color-surface-bright: "#121820"
+  md-sys-color-outline: "#1f3a44"
+  md-sys-color-outline-variant: "#1f3a44"
+  md-sys-color-primary: "#00e5ff"
+  md-sys-color-on-primary: "#041016"
+  md-filled-text-field-container-color: "#0d1418"
+  md-filled-text-field-input-text-color: "#e6fbff"
+  md-filled-text-field-label-text-color: "#7aa8b8"
+  md-outlined-text-field-input-text-color: "#e6fbff"
+  md-outlined-text-field-label-text-color: "#7aa8b8"
+  md-outlined-text-field-outline-color: "#1f3a44"
+  md-list-item-label-text-color: "#e6fbff"
+  md-list-item-supporting-text-color: "#7aa8b8"
+  md-list-item-container-color: "#10151c"
+  modes:
+    dark:
+      ha-color-form-background: "#0d1418"
+      ha-color-form-background-hover: "#121820"
+      ha-color-form-background-disabled: "#10151c"
+      ha-color-text-primary: "#e6fbff"
+      ha-color-on-surface-default: "#e6fbff"
+      md-sys-color-on-surface: "#e6fbff"
+  ha-card-border-radius: "10px"
+  ha-card-box-shadow: "0 0 12px rgba(0, 229, 255, 0.12)"
+  primary-font-family: '"Share Tech Mono", "Segoe UI", sans-serif'
+  paper-font-common-base_-_font-family: '"Share Tech Mono", "Segoe UI", sans-serif'
+  lovelace-background: "repeating-linear-gradient(180deg, #07090d, #07090d 2px, rgba(0, 229, 255, 0.09) 3px)"
+  card-mod-theme: Alleycat
+  card-mod-root: |
+    .header {
+      border-bottom: 1px solid #1f3a44 !important;
+    }
+    :host::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1000;
+      background-image: repeating-linear-gradient(
+        180deg,
+        transparent 0,
+        transparent 2px,
+        rgba(0, 229, 255, 0.09) 3px
+      );
+    }
+  card-mod-card: |
+    ha-card {
+      border: 1px solid #1f3a44;
+      background: linear-gradient(180deg, #121820 0%, #0b1016 100%);
+    }
+  card-mod-view: |
+    :host {
+      background-image: repeating-linear-gradient(
+        180deg,
+        transparent 0,
+        transparent 2px,
+        rgba(0, 229, 255, 0.09) 3px
+      ) !important;
+    }
