@@ -1,6 +1,0 @@
-dependencies:
-  espressif/led_strip: ">=2.5.0"
-  idf: ">=5.0.0"
-  nopnop2002/ssd1306:
-    path: components/ssd1306/
-    git: https://github.com/nopnop2002/esp-idf-ssd1306.git
