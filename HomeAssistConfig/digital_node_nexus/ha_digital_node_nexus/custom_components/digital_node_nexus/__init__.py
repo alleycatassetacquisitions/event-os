@@ -155,14 +155,22 @@ async def websocket_set_placement(hass: HomeAssistant, connection, msg) -> None:
 
 
 async def _fetch_alleycattv_zones(hass: HomeAssistant) -> list[dict]:
-    """Live zone list from AlleycatTV â€” never a hardcoded name enum."""
+    """Live zone list from AlleycatTV — never a hardcoded name enum."""
     server_url = None
-    for entry in hass.config_entries.async_entries("alleycattv"):
-        server_url = entry.data.get("server_url") or entry.options.get("server_url")
-        if server_url:
-            break
+    try:
+        from custom_components.alleycat_directory.helpers import get_url
+        server_url = get_url(hass, "alleycattv", "")
+    except Exception:  # noqa: BLE001
+        block = (hass.data.get("alleycat_directory") or {}).get("services") or {}
+        server_url = str((block.get("alleycattv") or {}).get("url") or "")
     if not server_url:
-        server_url = "http://192.168.1.144"
+        for entry in hass.config_entries.async_entries("alleycattv"):
+            server_url = entry.data.get("server_url") or entry.options.get("server_url")
+            if server_url:
+                break
+    if not server_url:
+        yaml_url = (hass.data.get("alleycattv") or {}).get("yaml_server_url")
+        server_url = yaml_url or "http://192.168.1.144"
     try:
         session = async_get_clientsession(hass)
         timeout = aiohttp.ClientTimeout(total=8)

@@ -1,0 +1,21 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Core Configurator",
+        "description": "Source of truth for Alleycat app endpoints. You can edit these later from the Core Configurator sidebar tab.",
+        "data": {
+          "registration_primary": "Registration online URL",
+          "registration_secondary": "Registration local (LAN) URL",
+          "alleycattv": "AlleycatTV streaming server",
+          "bounty": "Galactic Bounty Network server",
+          "proxmox": "Proxmox URL",
+          "proxmox_node": "Proxmox node name"
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Core Configurator is already configured."
+    }
+  }
+}

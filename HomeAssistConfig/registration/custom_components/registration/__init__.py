@@ -41,6 +41,24 @@ _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS: list[Platform] = [Platform.SENSOR]
 
+
+def _dir_url(hass: HomeAssistant, key: str, default: str = "") -> str:
+    try:
+        from custom_components.alleycat_directory.helpers import get_url
+        return get_url(hass, key, default)
+    except Exception:  # noqa: BLE001
+        block = (hass.data.get("alleycat_directory") or {}).get("services") or {}
+        url = str((block.get(key) or {}).get("url") or "").strip().rstrip("/")
+        return url or str(default or "").rstrip("/")
+
+
+def _dir_apply(hass: HomeAssistant, key: str, url: str) -> bool:
+    try:
+        from custom_components.alleycat_directory.helpers import apply_service
+        return bool(apply_service(hass, key, url=url))
+    except Exception:  # noqa: BLE001
+        return False
+
 CONFIG_SCHEMA = vol.Schema(
     {
         vol.Optional(DOMAIN): vol.Schema(
@@ -342,8 +360,8 @@ async def ws_get_status(hass: HomeAssistant, connection, msg) -> None:
         return
     connection.send_result(msg["id"], {
         "mode": api._mode,
-        "online_url": api.base_url,
-        "local_url": api._local_url,
+        "online_url": _dir_url(hass, "registration_primary", api.base_url),
+        "local_url": _dir_url(hass, "registration_secondary", api._local_url),
         "active_url": api.active_url,
     })
 
@@ -364,28 +382,28 @@ async def ws_set_server(hass: HomeAssistant, connection, msg) -> None:
         return
     online_url = (msg.get("online_url") or "").strip() or None
     local_url = (msg.get("local_url") or "").strip() or None
+    wrote_dir = False
+    if online_url:
+        wrote_dir = _dir_apply(hass, "registration_primary", online_url) or wrote_dir
+    if local_url is not None:
+        wrote_dir = _dir_apply(hass, "registration_secondary", local_url or "") or wrote_dir
     api.set_mode(msg["mode"], online_url=online_url, local_url=local_url)
 
-    # Persist mode + URLs to the config entry so they survive HA restarts.
-    # Panel settings win over YAML until the user changes them again.
+    # Mode stays on this integration. URLs belong to Service Directory when present.
     entry_id = hass.data[DOMAIN].get("entry_id")
     if entry_id:
         entry = hass.config_entries.async_get_entry(entry_id)
         if entry:
-            hass.config_entries.async_update_entry(
-                entry,
-                data={
-                    **entry.data,
-                    CONF_BASE_URL: api.base_url,
-                    CONF_FALLBACK_URL: api._local_url,
-                    CONF_MODE: api._mode,
-                },
-            )
+            new_data = {**entry.data, CONF_MODE: api._mode}
+            if not wrote_dir:
+                new_data[CONF_BASE_URL] = api.base_url
+                new_data[CONF_FALLBACK_URL] = api._local_url
+            hass.config_entries.async_update_entry(entry, data=new_data)
 
     connection.send_result(msg["id"], {
         "mode": api._mode,
-        "online_url": api.base_url,
-        "local_url": api._local_url,
+        "online_url": _dir_url(hass, "registration_primary", api.base_url),
+        "local_url": _dir_url(hass, "registration_secondary", api._local_url),
         "active_url": api.active_url,
     })
 
@@ -408,14 +426,13 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data.setdefault(DOMAIN, {})
     yaml_conf = hass.data[DOMAIN].get("yaml") or {}
-    # Config entry (panel Apply) wins over YAML so saved DO/local URLs stick
-    # across restarts. YAML is only a seed for missing keys / first install.
-    online_url = str(
+    # Service Directory is the authority for URLs when it is loaded.
+    online_url = _dir_url(hass, "registration_primary") or str(
         entry.data.get(CONF_BASE_URL)
         or yaml_conf.get(CONF_BASE_URL)
         or DEFAULT_BASE_URL
     )
-    local_url = str(
+    local_url = _dir_url(hass, "registration_secondary") or str(
         entry.data.get(CONF_FALLBACK_URL)
         or yaml_conf.get(CONF_FALLBACK_URL)
         or DEFAULT_FALLBACK_URL
@@ -427,6 +444,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     api = PlayerApi(hass, online_url, token, local_url=local_url, mode=mode)
     hass.data[DOMAIN]["api"] = api
     hass.data[DOMAIN]["entry_id"] = entry.entry_id
+
+    def _sync_urls(_event=None) -> None:
+        current = get_api(hass)
+        if not current:
+            return
+        current.set_mode(
+            current._mode,
+            online_url=_dir_url(hass, "registration_primary", current.base_url) or None,
+            local_url=_dir_url(hass, "registration_secondary", current._local_url),
+        )
+
+    hass.data[DOMAIN]["directory_unsub"] = hass.bus.async_listen(
+        "alleycat_directory_updated", _sync_urls
+    )
     await _register_ws_and_services(hass)
     try:
         await api.list_players()
@@ -438,6 +469,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    unsub = hass.data.get(DOMAIN, {}).pop("directory_unsub", None)
+    if unsub:
+        unsub()
     hass.data.get(DOMAIN, {}).pop("api", None)
     return unload_ok
 

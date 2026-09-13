@@ -1,0 +1,12 @@
+{
+  "domain": "bugbuster",
+  "name": "Bug Buster",
+  "documentation": "https://github.com/DLightmedia/ProjectMissionControl",
+  "requirements": [],
+  "dependencies": ["mqtt", "http"],
+  "after_dependencies": ["alleycat_directory"],
+  "codeowners": [],
+  "version": "1.0.0",
+  "iot_class": "local_polling",
+  "config_flow": true
+}

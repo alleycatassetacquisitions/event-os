@@ -56,22 +56,17 @@ class AlleycatTVPanel extends HTMLElement {
   }
 
   _resolveServerUrl() {
-    // 0. User override stored in browser localStorage (survives HA restarts)
-    const stored = localStorage.getItem("alleycattv_server_url");
-    if (stored) return stored.replace(/\/$/, "");
-    // 1. Check panel element attribute set via configuration.yaml panel_custom config
-    if (this._panel?.config?.server_url) return this._panel.config.server_url;
-    // 2. Check hass panel config
-    try {
-      if (this.panel?.config?.server_url) return this.panel.config.server_url;
-    } catch (_) {}
-    // 3. Try config entry data
-    try {
-      const entry = Object.values(this._hass?.config_entries || {})
-        .find(e => e.domain === "alleycattv");
-      if (entry?.data?.server_url) return entry.data.server_url;
-    } catch (_) {}
-    return "http://headless-alleycat-streaming-server.local"; // fallback
+    return (this._serverUrl || "http://headless-alleycat-streaming-server.local").replace(/\/$/, "");
+  }
+
+  async _loadDirectoryUrl() {
+    const fallback = this._panel?.config?.server_url
+      || "http://headless-alleycat-streaming-server.local";
+    if (window.AlleycatDirectory && this._hass) {
+      this._serverUrl = await window.AlleycatDirectory.getUrl(this._hass, "alleycattv", fallback);
+    } else if (!this._serverUrl) {
+      this._serverUrl = String(fallback).replace(/\/$/, "");
+    }
   }
 
   _openServerUrlDialog() {
@@ -85,6 +80,7 @@ class AlleycatTVPanel extends HTMLElement {
   }
 
   async _initAsync() {
+    await this._loadDirectoryUrl();
     await this._fetchServerZones();
     await this._loadDevices();
     await this._loadAreas();
@@ -1040,22 +1036,31 @@ class AlleycatTVPanel extends HTMLElement {
     root.getElementById("btn-url-cancel")?.addEventListener("click", () => {
       root.getElementById("server-url-dialog").style.display = "none";
     });
-    root.getElementById("btn-url-clear")?.addEventListener("click", () => {
-      if (!confirm("Clear the stored server URL override? The URL from configuration.yaml will be used instead.")) return;
-      localStorage.removeItem("alleycattv_server_url");
+    root.getElementById("btn-url-clear")?.addEventListener("click", async () => {
+      await this._loadDirectoryUrl();
       root.getElementById("server-url-dialog").style.display = "none";
-      this._serverUrl = this._resolveServerUrl();
-      this._showFeedback("Override cleared — reloading…", "info");
-      setTimeout(() => location.reload(), 1200);
+      this._showFeedback("Reloaded streaming URL from Core Configurator", "info");
     });
-    root.getElementById("btn-url-save")?.addEventListener("click", () => {
+    root.getElementById("btn-url-save")?.addEventListener("click", async () => {
       const inp = root.getElementById("server-url-input");
       const val = (inp?.value || "").trim().replace(/\/$/, "");
       if (!val) return this._showFeedback("Enter a server URL first", "warn");
-      localStorage.setItem("alleycattv_server_url", val);
-      root.getElementById("server-url-dialog").style.display = "none";
-      this._showFeedback(`Server URL saved — reloading…`, "success");
-      setTimeout(() => location.reload(), 1200);
+      try {
+        if (window.AlleycatDirectory) {
+          await window.AlleycatDirectory.setService(this._hass, "alleycattv", { url: val });
+        } else {
+          await this._hass.connection.sendMessagePromise({
+            type: "alleycat_directory/set_service",
+            key: "alleycattv",
+            url: val,
+          });
+        }
+        this._serverUrl = val;
+        root.getElementById("server-url-dialog").style.display = "none";
+        this._showFeedback(`Streaming server saved in Core Configurator`, "success");
+      } catch (err) {
+        this._showFeedback(`Save failed: ${err.message || err}`, "warn");
+      }
     });
     // Close dialog on overlay click
     root.getElementById("server-url-dialog")?.addEventListener("click", (e) => {

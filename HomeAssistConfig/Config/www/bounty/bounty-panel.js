@@ -58,15 +58,20 @@ class BountyPanel extends HTMLElement {
   }
 
   _resolveServerUrl() {
-    const stored = localStorage.getItem("bounty_server_url");
-    if (stored) return stored.replace(/\/$/, "");
-    if (this._panel?.config?.server_url) {
-      return String(this._panel.config.server_url).replace(/\/$/, "");
+    return String(this._serverUrl || "http://192.168.1.206:8100").replace(/\/$/, "");
+  }
+
+  async _loadDirectoryUrl() {
+    const fallback = this._panel?.config?.server_url || this._serverUrl || "http://192.168.1.206:8100";
+    if (window.AlleycatDirectory && this._hass) {
+      this._serverUrl = await window.AlleycatDirectory.getUrl(this._hass, "bounty", fallback);
+    } else {
+      this._serverUrl = String(fallback).replace(/\/$/, "");
     }
-    return "http://192.168.1.206:8100";
   }
 
   async _boot() {
+    await this._loadDirectoryUrl();
     await this._loadPlayers();
     await this._refreshCameras();
   }
@@ -621,14 +626,26 @@ class BountyPanel extends HTMLElement {
     }
   }
 
-  _saveServerUrl() {
+  async _saveServerUrl() {
     const inp = this.shadowRoot.getElementById("server-url-input");
     const url = (inp?.value || "").trim().replace(/\/$/, "");
     if (!url) return;
-    localStorage.setItem("bounty_server_url", url);
-    this._serverUrl = url;
-    this.shadowRoot.getElementById("server-url-dialog").style.display = "none";
-    this._feedback(`Bounty server: ${url}`, "ok");
+    try {
+      if (window.AlleycatDirectory) {
+        await window.AlleycatDirectory.setService(this._hass, "bounty", { url });
+      } else {
+        await this._hass.connection.sendMessagePromise({
+          type: "alleycat_directory/set_service",
+          key: "bounty",
+          url,
+        });
+      }
+      this._serverUrl = url;
+      this.shadowRoot.getElementById("server-url-dialog").style.display = "none";
+      this._feedback(`Bounty server saved in Core Configurator: ${url}`, "ok");
+    } catch (err) {
+      this._feedback(`Save failed: ${this._errText(err)}`, "err");
+    }
   }
 
   _render() {

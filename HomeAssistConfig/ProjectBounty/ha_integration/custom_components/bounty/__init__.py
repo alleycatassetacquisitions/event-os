@@ -19,6 +19,20 @@ from .const import CONF_SERVER_URL, DEFAULT_SERVER_URL, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
+
+def _dir_url(hass: HomeAssistant, default: str) -> str:
+    try:
+        from custom_components.alleycat_directory.helpers import get_url
+        url = get_url(hass, "bounty", "")
+        if url:
+            return url
+    except Exception:  # noqa: BLE001
+        block = (hass.data.get("alleycat_directory") or {}).get("services") or {}
+        url = str((block.get("bounty") or {}).get("url") or "").rstrip("/")
+        if url:
+            return url
+    return default.rstrip("/")
+
 CONFIG_SCHEMA = vol.Schema(
     {
         vol.Optional(DOMAIN): vol.Schema(
@@ -48,18 +62,29 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    server_url = entry.data.get(CONF_SERVER_URL, DEFAULT_SERVER_URL).rstrip("/")
+    fallback = entry.data.get(CONF_SERVER_URL, DEFAULT_SERVER_URL)
+    server_url = _dir_url(hass, fallback)
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN]["server_url"] = server_url
+
+    def _sync(_event=None) -> None:
+        hass.data[DOMAIN]["server_url"] = _dir_url(hass, fallback)
+
+    hass.data[DOMAIN]["directory_unsub"] = hass.bus.async_listen(
+        "alleycat_directory_updated", _sync
+    )
     _LOGGER.info("ProjectBounty configured — server %s", server_url)
     return True
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    unsub = hass.data.get(DOMAIN, {}).pop("directory_unsub", None)
+    if unsub:
+        unsub()
     hass.data.pop(DOMAIN, None)
     return True
 
 
 def get_server_url(hass: HomeAssistant) -> str:
     data: dict[str, Any] = hass.data.get(DOMAIN) or {}
-    return str(data.get("server_url") or DEFAULT_SERVER_URL).rstrip("/")
+    return _dir_url(hass, str(data.get("server_url") or DEFAULT_SERVER_URL))

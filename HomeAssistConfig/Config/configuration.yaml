@@ -7,11 +7,14 @@ frontend:
     - /hacsfiles/custom-sidebar/custom-sidebar-plugin.js
     - /hacsfiles/lovelace-card-mod/card-mod.js?hacstag=190927524421
     - /local/alleycat-scanlines.js?v=0.10
+    - /local/directory/directory-client.js?v=1
+    - /local/directory/directory-panel.js?v=3
     - /local/digital_node_nexus/digital-node-nexus-panel.js
-    - /local/alleycattv/alleycattv-panel.js?v=rtsp-1
-    - /local/alleycattv/alleycattv-content-panel.js?v=rtsp-1
+    - /local/alleycattv/alleycattv-panel.js?v=dir-1
+    - /local/alleycattv/alleycattv-content-panel.js?v=dir-1
     - /local/registration/registration-panel.js
     - /local/bounty/bounty-panel.js
+    - /local/bugbuster/bugbuster-panel.js?v=4
 
 automation: !include automations.yaml
 script: !include scripts.yaml
@@ -21,6 +24,12 @@ rest: !include rest.yaml
 rest_command: !include rest_commands.yaml
 
 panel_custom:
+  - name: alleycat-directory-panel
+    sidebar_title: Core Configurator
+    sidebar_icon: mdi:lan
+    url_path: directory
+    module_url: /local/directory/directory-panel.js?v=3
+
   - name: registration-panel
     sidebar_title: Registration
     sidebar_icon: mdi:radar
@@ -37,7 +46,7 @@ panel_custom:
     sidebar_title: AlleycatTV
     sidebar_icon: mdi:television-play
     url_path: alleycattv
-    module_url: /local/alleycattv/alleycattv-panel.js?v=rtsp-1
+    module_url: /local/alleycattv/alleycattv-panel.js?v=dir-1
     config:
       server_url: "http://headless-alleycat-streaming-server.local"
 
@@ -45,7 +54,7 @@ panel_custom:
     sidebar_title: Content Manager
     sidebar_icon: mdi:folder-play
     url_path: alleycattv-content
-    module_url: /local/alleycattv/alleycattv-content-panel.js?v=rtsp-1
+    module_url: /local/alleycattv/alleycattv-content-panel.js?v=dir-1
     config:
       server_url: "http://headless-alleycat-streaming-server.local"
 
@@ -57,6 +66,12 @@ panel_custom:
     config:
       server_url: !secret bounty_base
 
+  - name: bugbuster-panel
+    sidebar_title: Bug Buster
+    sidebar_icon: mdi:ladybug
+    url_path: bugbuster
+    module_url: /local/bugbuster/bugbuster-panel.js?v=4
+
 digital_node_nexus:
 alleycattv:
   server_url: !secret alleycattv_base
@@ -64,3 +79,16 @@ registration:
   base_url: !secret player_api_base
 bounty:
   server_url: !secret bounty_base
+alleycat_directory:
+  registration_primary: !secret player_api_base
+  registration_secondary: !secret player_api_local
+  alleycattv: !secret alleycattv_base
+  bounty: !secret bounty_base
+  proxmox: !secret proxmox_url
+  proxmox_node: !secret proxmox_node
+  proxmox_token_id: !secret bugbuster_token_id
+  proxmox_token_secret: !secret bugbuster_token_secret
+bugbuster:
+  token_id: !secret bugbuster_token_id
+  token_secret: !secret bugbuster_token_secret
+  verify_ssl: false

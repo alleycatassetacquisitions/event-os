@@ -13,6 +13,8 @@ class MissionControlPanel extends HTMLElement {
     this._nameStatus = "";
     this._editingId = null;
     this._postersByPlayer = {};
+    this._bountyUrl = "http://192.168.1.206:8100";
+    this._dirUnsub = null;
   }
 
   set hass(hass) {
@@ -20,8 +22,7 @@ class MissionControlPanel extends HTMLElement {
     if (!this._initialized) {
       this._initialized = true;
       this._render();
-      this._loadStatus();
-      this._loadPlayers();
+      this._boot();
     }
   }
 
@@ -33,14 +34,38 @@ class MissionControlPanel extends HTMLElement {
     if (this._hass && !this._initialized) {
       this._initialized = true;
       this._render();
-      this._loadStatus();
-      this._loadPlayers();
+      this._boot();
     }
   }
 
   disconnectedCallback() {
     this._initialized = false;
     if (this._checkTimer) clearTimeout(this._checkTimer);
+    if (this._dirUnsub) {
+      try { this._dirUnsub(); } catch (_) { /* ignore */ }
+      this._dirUnsub = null;
+    }
+  }
+
+  async _boot() {
+    await this._refreshDirectory();
+    await this._loadStatus();
+    await this._loadPlayers();
+    if (window.AlleycatDirectory?.subscribe && this._hass) {
+      this._dirUnsub = await window.AlleycatDirectory.subscribe(this._hass, () => {
+        this._refreshDirectory().then(() => {
+          this._loadStatus();
+          this._loadBountyPosters();
+        });
+      });
+    }
+  }
+
+  async _refreshDirectory() {
+    if (!this._hass) return;
+    const dir = window.AlleycatDirectory;
+    if (!dir) return;
+    this._bountyUrl = await dir.getUrl(this._hass, "bounty", this._bountyUrl);
   }
 
   // ── data loading ──────────────────────────────────────────────────────────
@@ -64,9 +89,7 @@ class MissionControlPanel extends HTMLElement {
   }
 
   _bountyBaseUrl() {
-    const stored = localStorage.getItem("bounty_server_url");
-    if (stored) return stored.replace(/\/$/, "");
-    return "http://192.168.1.206:8100";
+    return String(this._bountyUrl || "").replace(/\/$/, "") || "http://192.168.1.206:8100";
   }
 
   _posterUrlForPlayer(playerId) {
@@ -490,6 +513,7 @@ class MissionControlPanel extends HTMLElement {
             <h3>Server Settings</h3>
             <button type="button" class="modal-close" id="btn-modal-close">&times;</button>
           </div>
+          <p class="sub" style="margin:0 0 12px;font-size:12px">Online vs LAN is a Registration choice. The IPs themselves live in Core Configurator.</p>
           <div class="mode-row">
             <button type="button" id="btn-mode-online" class="mode-btn mode-active">Online</button>
             <button type="button" id="btn-mode-local" class="mode-btn">Local</button>

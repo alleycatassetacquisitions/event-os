@@ -1,0 +1,19 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Bug Buster",
+        "description": "Proxmox host and node come from Core Configurator. Paste an API token here (Datacenter → Permissions → API Tokens). Token ID looks like root@pam!bugbuster.",
+        "data": {
+          "token_id": "API token ID",
+          "token_secret": "API token secret",
+          "verify_ssl": "Verify TLS certificate",
+          "mqtt_topic": "MQTT subscribe filter"
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Bug Buster is already configured."
+    }
+  }
+}

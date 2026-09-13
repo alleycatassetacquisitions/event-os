@@ -1,0 +1,36 @@
+/* Alleycat shared panel chrome — neon terminal look for custom sidebar panels. */
+@import url("https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap");
+
+:host {
+  --ac-cyan: #00e5ff;
+  --ac-magenta: #ff2bd6;
+  --ac-scan: rgba(0, 229, 255, 0.09);
+  font-family: "Share Tech Mono", var(--primary-font-family, ui-monospace, sans-serif) !important;
+}
+
+.page-header,
+header {
+  border-bottom: 1px solid var(--divider-color, #1f3a44) !important;
+  box-shadow: 0 0 18px rgba(0, 229, 255, 0.12);
+  background-image: repeating-linear-gradient(
+    180deg,
+    transparent,
+    transparent 2px,
+    var(--ac-scan) 3px
+  );
+}
+
+h1,
+.page-header h1 {
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-shadow: 0 0 12px rgba(0, 229, 255, 0.35);
+}
+
+.card,
+.zone-card,
+.item,
+.pi-card,
+.host-card {
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.08);
+}

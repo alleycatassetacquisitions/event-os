@@ -16,6 +16,7 @@ class AlleycatTVContentPanel extends HTMLElement {
     this._confirmCb = null;
     this._promptCb = null;
     this._libDrag = null;
+    this._cachedServerUrl = "http://headless-alleycat-streaming-server.local";
   }
 
   set hass(hass) {
@@ -33,18 +34,25 @@ class AlleycatTVContentPanel extends HTMLElement {
     if (this._initialized || !this._hass) return;
     this._initialized = true;
     this._render();
+    this._boot();
+  }
+
+  async _boot() {
+    await this._loadDirectoryUrl();
     this._loadAll();
   }
 
   _serverUrl() {
-    // 0. User override stored in browser localStorage (survives HA restarts)
-    const stored = localStorage.getItem("alleycattv_server_url");
-    if (stored) return stored.replace(/\/$/, "");
-    const raw =
-      this._panel?.config?.server_url ||
-      this.panel?.config?.server_url ||
-      "http://headless-alleycat-streaming-server.local";
-    return String(raw).replace(/\/$/, "");
+    return String(this._cachedServerUrl || "http://headless-alleycat-streaming-server.local").replace(/\/$/, "");
+  }
+
+  async _loadDirectoryUrl() {
+    const fallback = this._panel?.config?.server_url || this._cachedServerUrl;
+    if (window.AlleycatDirectory && this._hass) {
+      this._cachedServerUrl = await window.AlleycatDirectory.getUrl(this._hass, "alleycattv", fallback);
+    } else if (this._panel?.config?.server_url) {
+      this._cachedServerUrl = String(this._panel.config.server_url).replace(/\/$/, "");
+    }
   }
 
   async _openServerUrlDialog() {
@@ -639,17 +647,30 @@ class AlleycatTVContentPanel extends HTMLElement {
     root.getElementById("btn-url-cancel")?.addEventListener("click", () => {
       root.getElementById("server-url-dialog").style.display = "none";
     });
-    root.getElementById("btn-url-clear")?.addEventListener("click", () => {
-      if (!confirm("Clear the stored server URL override? The URL from configuration.yaml will be used instead.")) return;
-      localStorage.removeItem("alleycattv_server_url");
+    root.getElementById("btn-url-clear")?.addEventListener("click", async () => {
+      await this._loadDirectoryUrl();
       root.getElementById("server-url-dialog").style.display = "none";
-      setTimeout(() => location.reload(), 500);
+      this._toast("Reloaded streaming URL from Core Configurator", "ok");
     });
     root.getElementById("btn-url-save")?.addEventListener("click", async () => {
       const inp = root.getElementById("server-url-input");
       const val = (inp?.value || "").trim().replace(/\/$/, "");
       if (!val) return this._toast("Enter a server URL first", "err");
-      localStorage.setItem("alleycattv_server_url", val);
+      try {
+        if (window.AlleycatDirectory) {
+          await window.AlleycatDirectory.setService(this._hass, "alleycattv", { url: val });
+        } else {
+          await this._hass.connection.sendMessagePromise({
+            type: "alleycat_directory/set_service",
+            key: "alleycattv",
+            url: val,
+          });
+        }
+        this._cachedServerUrl = val;
+      } catch (err) {
+        this._toast(`Directory save failed: ${err.message}`, "err");
+        return;
+      }
 
       const rtspUrl = (root.getElementById("rtsp-url-input")?.value || "").trim();
       const rtspLabel = (root.getElementById("rtsp-label-input")?.value || "").trim() || "Live RTSP";
